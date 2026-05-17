@@ -12,7 +12,6 @@ export default async function handler(req, res) {
 
     let systemPrompt = messages.find(m => m.role === "system")?.content || "";
     let history = messages.filter(m => m.role !== "system").slice(-14);
-    let hasImage = history.some(m => m.imageBase64);
 
     // ── TRANSLATE MODE ──
     if (translateTo) {
@@ -22,7 +21,6 @@ export default async function handler(req, res) {
           `You are a professional translator. Translate the following text to: ${translateTo}. ` +
           `Return ONLY the translation. No explanations, no quotes, nothing else.`;
         history = [{ role: "user", content: typeof lastUser.content === "string" ? lastUser.content : "" }];
-        hasImage = false;
       }
     }
 
@@ -59,54 +57,45 @@ export default async function handler(req, res) {
       }
     }
 
-    // ── BUILD MISTRAL MESSAGES ──
-    const mistralMessages = [];
-    if (systemPrompt) mistralMessages.push({ role: "system", content: systemPrompt });
+    // ── BUILD UNFILTERED MESSAGES ──
+    const apiMessages = [];
+    if (systemPrompt) apiMessages.push({ role: "system", content: systemPrompt });
 
     for (const m of history) {
       const role = m.role === "assistant" ? "assistant" : "user";
-      if (m.imageBase64 && m.imageMime) {
-        mistralMessages.push({
-          role,
-          content: [
-            { type: "text", text: String(m.content || "Describe this image.").slice(0, 3000) },
-            { type: "image_url", image_url: { url: `data:${m.imageMime};base64,${m.imageBase64}` } }
-          ]
-        });
-      } else {
-        mistralMessages.push({ role, content: String(m.content || "").slice(0, 6000) });
-      }
+      apiMessages.push({ role, content: String(m.content || "").slice(0, 6000) });
     }
 
-    if (!mistralMessages.filter(m => m.role !== "system").length)
+    if (!apiMessages.filter(m => m.role !== "system").length)
       return res.status(400).json({ error: { message: "No user messages" } });
 
-    const lastNonSystem = [...mistralMessages].reverse().find(m => m.role !== "system");
+    const lastNonSystem = [...apiMessages].reverse().find(m => m.role !== "system");
     if (!lastNonSystem || lastNonSystem.role !== "user")
       return res.status(400).json({ error: { message: "Last message must be from user" } });
 
-    // Use pixtral-large for vision (same tier, adds image support)
-    const model = hasImage ? "pixtral-large-latest" : "mistral-large-latest";
+    // САМАЯ УМНАЯ МОДЕЛЬ на UnfilteredAPI (бесплатно!)
+    // Доступны: llama-3.1-405b (самая умная), llama-3-70b, mistral-8x7b, qwen-72b
+    const model = "llama-3.1-405b-instruct-turbo";
 
-    const mistralRes = await fetch("https://api.mistral.ai/v1/chat/completions", {
+    const apiRes = await fetch("https://api.unfiltered.ai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
+        "Authorization": `Bearer ${process.env.UNFILTERED_API_KEY}`,
       },
       body: JSON.stringify({
         model,
-        messages: mistralMessages,
-        temperature: Math.min(Math.max(parseFloat(temperature) || 0.7, 0), 1.5),
-        max_tokens: 8192,
+        messages: apiMessages,
+        temperature: Math.min(Math.max(parseFloat(temperature) || 0.7, 0), 2),
+        max_tokens: 2000,
         stream: true,
       }),
     });
 
-    if (!mistralRes.ok) {
-      const err = await mistralRes.json().catch(() => ({}));
-      return res.status(mistralRes.status).json({
-        error: { message: err?.message || err?.error?.message || "Mistral API error" }
+    if (!apiRes.ok) {
+      const err = await apiRes.json().catch(() => ({}));
+      return res.status(apiRes.status).json({
+        error: { message: err?.message || err?.error?.message || "UnfilteredAPI error" }
       });
     }
 
@@ -114,7 +103,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("X-Accel-Buffering", "no");
 
-    const reader = mistralRes.body.getReader();
+    const reader = apiRes.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
 
