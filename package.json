@@ -1,0 +1,23 @@
+{
+  "name": "mchat-mistral",
+  "version": "1.0.0",
+  "description": "MChat powered by Mistral Large",
+  "main": "api/chat.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static build'",
+    "start": "echo 'Use Vercel'"
+  },
+  "keywords": [
+    "chat",
+    "ai",
+    "mistral",
+    "web-search",
+    "pwa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": "18.x"
+  }
+}
