@@ -1,0 +1,49 @@
+{
+  "name": "MChat — Mistral Large",
+  "short_name": "MChat",
+  "description": "Умный чат на базе Mistral Large с веб-поиском, регенерацией, ветками и многим другим.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#cc7722",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23cc7722' rx='40'/><text x='50%' y='50%' font-size='90' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'>MC</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%23cc7722' rx='40'/><text x='50%' y='50%' font-size='90' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'>MC</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect width='540' height='720' fill='%231a1a1a'/><rect width='264' height='720' fill='%23171717'/><text x='270' y='80' font-size='24' fill='%23ececec' font-family='system-ui'>MChat</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["productivity"],
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Новый чат",
+      "short_name": "Новый чат",
+      "description": "Создать новый чат с Mistral Large",
+      "url": "/?action=new",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%23cc7722' rx='20'/><text x='50%' y='50%' font-size='45' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'>+</text></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
